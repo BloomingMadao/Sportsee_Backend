@@ -50,15 +50,15 @@ The API uses JWT (JSON Web Token) authentication. To access the endpoints:
 1. First obtain a JWT token by logging in:
 
 ```bash
-curl -X POST http://localhost:8000/login \
+curl -X POST http://localhost:8000/api/login \
   -H "Content-Type: application/json" \
-  -d '{"username": "karldovineau", "password": "password123"}'
+  -d '{"username": "sophiemartin", "password": "password123"}'
 ```
 
 2. Use the received token in subsequent requests in the Authorization header:
 
 ```bash
-curl -H "Authorization: Bearer your-jwt-token" http://localhost:8000/user
+curl -H "Authorization: Bearer your-jwt-token" http://localhost:8000/api/user-info
 ```
 
 ### 4.1 Available Users
@@ -73,9 +73,9 @@ Currently, the API has three demo users:
 
 ### 5.1 Authentication Endpoint
 
-- `POST /login` - Authenticates a user and returns a JWT token
+- `POST /api/login` - Authenticates a user and returns a JWT token
   - Required body: `{ "username": "string", "password": "string" }`
-  - Returns: `{ "token": "jwt-token", "userId": number }`
+  - Returns: `{ "token": "jwt-token", "userId": "string" }`
 
 ### 5.2 Data Endpoints
 
@@ -86,36 +86,46 @@ All these endpoints require authentication via a Bearer token in the header:
 ```http
 GET /api/user-info
 ```
-Returns user profile information, statistics, and goals.
+Returns the user profile and overall statistics:
+```json
+{
+  "profile": {
+    "firstName": "string",
+    "lastName": "string",
+    "createdAt": "string",
+    "age": number,
+    "weight": number,
+    "height": number,
+    "profilePicture": "string"
+  },
+  "statistics": {
+    "totalDistance": "string",
+    "totalSessions": number,
+    "totalDuration": number
+  }
+}
+```
 
 #### Get Activity Sessions
 ```http
 GET /api/user-activity?startWeek=<date>&endWeek=<date>
 ```
-Returns running sessions between two dates.
+Returns an array of running sessions between two dates (sorted ascending, future dates excluded).
 
 **Parameters:**
 - `startWeek`: Start date (ISO format)
 - `endWeek`: End date (ISO format)
 
 
-#### Get Profile Image
+#### Access Profile Images
 ```http
-GET /api/profile-image
+GET /images/<filename>
 ```
-Returns the user's profile image path.
-
-#### Access Uploaded Images
-```http
-GET /uploads/<filename>
-```
-Endpoint to access uploaded images.
+Serves the static profile images (e.g. the `profilePicture` URLs returned by `/api/user-info`).
 
 
 #### Notes
 - All dates should be in ISO format (YYYY-MM-DD)
-- Image uploads are limited to 5MB
-- Supported image formats: jpg, jpeg, png, gif
 - All distances are in kilometers
 - All durations are in minutes
 
@@ -124,15 +134,16 @@ Endpoint to access uploaded images.
 
 ```bash
 # Login
-curl -X POST http://localhost:8000/login \
+curl -X POST http://localhost:8000/api/login \
   -H "Content-Type: application/json" \
-  -d '{"username": "karldovineau", "password": "password123"}'
+  -d '{"username": "sophiemartin", "password": "password123"}'
 
 # Get user data
-curl -H "Authorization: Bearer your-jwt-token" http://localhost:8000/user
+curl -H "Authorization: Bearer your-jwt-token" http://localhost:8000/api/user-info
 
 # Get user activity
-curl -H "Authorization: Bearer your-jwt-token" http://localhost:8000/user/activity
+curl -H "Authorization: Bearer your-jwt-token" \
+  "http://localhost:8000/api/user-activity?startWeek=2025-01-01&endWeek=2025-01-31"
 ```
 
 ### 5.4 Error Responses

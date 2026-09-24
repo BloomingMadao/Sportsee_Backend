@@ -367,7 +367,7 @@
   },
   {
     "id": "user789",
-    "goal": 3,
+    "weeklyGoal": 3,
     "userInfos": {
       "firstName": "Emma",
       "lastName": "Leroy",
@@ -992,10 +992,11 @@
   },
   {
     "id": "user456",
+    "weeklyGoal": 2,
     "userInfos": {
       "firstName": "Marc",
       "lastName": "Dubois",
-      "goal": 2,
+
       "age": 45,
       "gender": "male",
       "height": 180,
